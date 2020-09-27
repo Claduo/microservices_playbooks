@@ -1,0 +1,29 @@
+---
+- hosts: app
+  become: yes
+  gather_facts: no
+  roles:
+    - elastic_stack
+  tasks:
+    - name: ensure filebeat installed
+      apt:
+        name: filebeat
+        state: present
+
+    - name: ensure filebeat config uploaded
+      copy:
+        src: filebeat_conf.yml
+        dest: /etc/filebeat/filebeat.yml
+      notify: restart filebeat
+
+    - name: ensure filebeat started
+      service:
+        name: filebeat
+        state: started
+        enabled: true
+
+  handlers:
+    - name: restart filebeat
+      service:
+        name: filebeat
+        state: restarted

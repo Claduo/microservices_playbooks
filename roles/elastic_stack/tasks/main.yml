@@ -1,0 +1,12 @@
+---
+- name: ensure ELK keys is added
+  apt_key:
+    url: 'https://artifacts.elastic.co/GPG-KEY-elasticsearch'
+    state: present
+
+- name: ensure ELK repositories are added
+  apt_repository:
+    repo: '{{ item }}'
+    state: present
+  with_items:
+    - 'deb https://artifacts.elastic.co/packages/7.x/apt stable main'

@@ -1,0 +1,50 @@
+---
+- hosts: app
+  become: yes
+  gather_facts: no
+  vars:
+    env_vars: |
+      DOCKER_USER=Claudo
+      DOCKER_PASSWORD=GitHub_Secret_Token
+      RABBITMQ_HOST=127.0.0.1
+      RABBITMQ_USER=ads
+      RABBITMQ_PASSWORD=ads_rabbit_Secret_Password
+      ADS_DATABASE_URL=postgresql://ads:ads_Secret_Password@localhost:5432/ads_microservice_production
+      AUTH_DATABASE_URL=postgresql://auth:auth_Secret_Password@localhost:5432/auth_microservice_production
+      RACK_ENV=production
+  tasks:
+    - name: ensure Docker GPG apt key added
+      become: yes
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: ensure Docker repository added
+      become: yes
+      apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu bionic stable
+        state: present
+
+    - name: ensure docker-ce apt updated and installed
+      become: yes
+      apt:
+        update_cache: yes
+        name: docker-ce
+        state: latest
+
+    - name: ensure installed pip
+      become: yes
+      apt:
+        update_cache: yes
+        name: python3-pip
+        state: latest
+
+    - name: ensure installed Docker module for Python
+      pip:
+        name: docker
+        state: present
+
+    - name: ensure env file is uploaded
+      copy:
+        content: '{{ env_vars }}'
+        dest: '/home/{{ ansible_user }}/.env'

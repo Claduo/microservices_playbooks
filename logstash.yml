@@ -1,0 +1,29 @@
+---
+- hosts: elk
+  become: yes
+  gather_facts: no
+  roles:
+    - elastic_stack
+  tasks:
+    - name: ensure logstash installed
+      apt:
+        name: logstash
+        state: present
+
+    - name: ensure logstash config uploaded
+      copy:
+        src: logstash.conf
+        dest: /etc/logstash/conf.d/logstash.conf
+      notify: restart logstash
+
+    - name: ensure logstash started
+      service:
+        name: logstash
+        state: started
+        enabled: true
+
+  handlers:
+    - name: restart logstash
+      service:
+        name: logstash
+        state: restarted

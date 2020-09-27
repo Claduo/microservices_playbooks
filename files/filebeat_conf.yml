@@ -1,0 +1,18 @@
+filebeat:
+  inputs:
+    - type: container
+      format: docker
+      stream: all
+      paths:
+        - "/var/lib/docker/containers/*/*.log"
+      json:
+        message_key: message
+        keys_under_root: true
+logging.level: debug
+setup:
+  kibana:
+    host: "http://165.227.159.91:5601"
+output:
+  logstash:
+    enabled: true
+    hosts: ["165.227.159.91:5044"]
